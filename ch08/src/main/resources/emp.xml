@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="empns">
+	<resultMap type="emp" id="empResult">
+		<result property="empno" 	column="empno"/>
+		<result property="ename" 	column="ename"/>
+		<result property="job" 		column="job"/>
+		<result property="mgr" 		column="mgr"/>
+		<result property="hiredate" column="hiredate"/>
+		<result property="sal" 		column="sal"/>
+		<result property="comm" 	column="comm"/>
+		<result property="deptno" 	column="deptno"/>
+		<!-- 관리자 이름 -->
+		<result property="mgrName" 	column="mgrName"/>
+		<!-- 조인용 부서정보 전체 -->
+		<collection property="dept" resultMap="deptResult"></collection>
+	</resultMap>
+	<!-- table과 class의 컬럼(속성)명이 다를 경우 -->
+	<resultMap type="dept" id="deptResult">
+		<result property="deptno"	column="deptno"/>
+		<result property="dname"	column="dname"/>
+		<result property="loc" 		column="loc"/>
+	</resultMap>
+<!-- 	self join 과 outer join -->
+	<select id="allList" resultMap="empResult">
+		select w.*,m.ename mgrName, d.* from emp m ,emp w,dept d 
+			where w.deptno=d.deptno and w.mgr=m.empno(+) order by w.ename
+	</select>
+<!-- 	<select id="allList" resultMap="empResult">
+		select e.*,d.* from emp e ,dept d 
+			where e.deptno=d.deptno order by ename
+	</select> -->
+	<select id="list" parameterType="integer" resultType="emp">
+		select * from emp where deptno=#{deptno} order by ename
+	</select> 
+	<select id="empList" resultType="emp">
+		select * from emp order by ename
+	</select>
+	<insert id="insert" parameterType="emp">
+		insert into emp values (#{empno},#{ename},#{job},#{mgr},
+			#{hiredate},#{sal},#{comm},#{deptno})
+	</insert>
+	<update id = "update" parameterType="emp">
+		update emp set ename = #{ename}, job=#{job},mgr = #{mgr},
+			hiredate=#{hiredate},sal=#{sal},comm=#{comm},deptno=#{deptno} where empno=#{empno}
+	</update>
+	<delete id="delete" parameterType="integer">
+		delete from emp where empno=#{empno}
+	</delete>
+	<select id="select" parameterType="integer" resultType="emp">
+		select * from emp where empno=#{empno}
+	</select>
+</mapper>
